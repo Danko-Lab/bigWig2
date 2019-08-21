@@ -6,15 +6,17 @@
    Using devtools to test
    library(devtools)
    install_github("Danko-Lab/bigWig", subdir="bigWig")
-   
-3. Creat a vignette, including 3 scenarios:
+
+3 Test and compare with orignial package.
+
+4. Creat a vignette, including 3 scenarios:
    1) Get counts in gene bodies for DEseq2
    2) Get the summary data for meta plot
    3) Get the counts to draw heatmap
 
-4 New function:
+5 New function:
   1) draw PRO-seq heatmap for bed regions.
 
-5. Debug
+6. Debug
    1) If the input regions are not contained in the bigwig file, return 0 or NA, not raise an error to stop the script.
    
