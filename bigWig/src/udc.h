@@ -153,8 +153,8 @@ boolean udcFastReadString(struct udcFile *f, char buf[256]);
 /* Read a string into buffer, which must be long enough
  * to hold it.  String is in 'writeString' format. */
 
-off_t udcFileSize(char *url);
-/* fetch remote or loca file size from given URL or path */
+//off_t udcFileSize(char *url);
+///* fetch remote or loca file size from given URL or path */
 
 boolean udcExists(char *url);
 /* return true if a remote or local file exists */

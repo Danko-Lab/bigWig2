@@ -28,7 +28,7 @@
 #include "linefile.h"
 #include "portable.h"
 #include "sig.h"
-#include "net.h"
+//#include "net.h"
 #include "cheapcgi.h"
 #include "udc.h"
 
@@ -113,87 +113,87 @@ static char *sparseDataName = "sparseData";
 static int cacheTimeout = 0;
 
 #define MAX_SKIP_TO_SAVE_RECONNECT (udcMaxBytesPerRemoteFetch / 2)
-
-static void readAndIgnore(int sd, bits64 size)
-/* Read size bytes from sd and return. */
-{
-static char *buf = NULL;
-if (buf == NULL)
-    buf = needMem(udcBlockSize);
-bits64 remaining = size, total = 0;
-while (remaining > 0)
-    {
-    bits64 chunkSize = min(remaining, udcBlockSize);
-    ssize_t rd = read(sd, buf, chunkSize);
-    if (rd < 0)
-	errnoAbort("readAndIgnore: error reading socket after %"PRIu64" bytes", total);
-    remaining -= rd;
-    total += rd;
-    }
-if (total < size)
-    errAbort("readAndIgnore: got EOF at %"PRIu64" bytes (wanted %"PRIu64")", total, size);
-}
-
-static int connInfoGetSocket(struct connInfo *ci, char *url, bits64 offset, int size)
-/* If ci has an open socket and the given offset matches ci's current offset,
- * reuse ci->socket.  Otherwise close the socket, open a new one, and update ci,
- * or return -1 if there is an error opening a new one. */
-{
-if (ci != NULL && ci->socket > 0 && ci->offset != offset)
-    {
-    bits64 skipSize = (offset - ci->offset);
-    if (skipSize > 0 && skipSize <= MAX_SKIP_TO_SAVE_RECONNECT)
-	{
-	verbose(2, "!! skipping %"PRIu64" bytes @%"PRIu64" to avoid reconnect\n", skipSize, ci->offset);
-	readAndIgnore(ci->socket, skipSize);
-	ci->offset = offset;
-	}
-    else
-	{
-	verbose(2, "Offset mismatch (ci %"PRIu64" != new %"PRIu64"), reopening.\n", ci->offset, offset);
-	mustCloseFd(&(ci->socket));
-	if (ci->ctrlSocket > 0)
-	    mustCloseFd(&(ci->ctrlSocket));
-	ZeroVar(ci);
-	}
-    }
-int sd;
-if (ci == NULL || ci->socket <= 0)
-    {
-    char rangeUrl[2048];
-    if (ci == NULL)
-	{
-	safef(rangeUrl, sizeof(rangeUrl), "%s;byterange=%"PRIu64"-%"PRIu64"",
-	      url, offset, (offset + size - 1));
-	sd = netUrlOpen(rangeUrl);
-	}
-    else
-	{
-	safef(rangeUrl, sizeof(rangeUrl), "%s;byterange=%"PRIu64"-", url, offset);
-	sd = ci->socket = netUrlOpenSockets(rangeUrl, &(ci->ctrlSocket));
-	ci->offset = offset;
-	}
-    if (sd < 0)
-	return -1;
-    if (startsWith("http", url))
-	{
-	char *newUrl = NULL;
-	int newSd = 0;
-	if (!netSkipHttpHeaderLinesHandlingRedirect(sd, rangeUrl, &newSd, &newUrl))
-	    return -1;
-	if (newUrl)
-	    {
-	    freeMem(newUrl); 
-	    sd = newSd;
-	    if (ci != NULL)
-		ci->socket = newSd;
-	    }
-	}
-    }
-else
-    sd = ci->socket;
-return sd;
-}
+//
+//static void readAndIgnore(int sd, bits64 size)
+///* Read size bytes from sd and return. */
+//{
+//static char *buf = NULL;
+//if (buf == NULL)
+//    buf = needMem(udcBlockSize);
+//bits64 remaining = size, total = 0;
+//while (remaining > 0)
+//    {
+//    bits64 chunkSize = min(remaining, udcBlockSize);
+//    ssize_t rd = read(sd, buf, chunkSize);
+//    if (rd < 0)
+//	errnoAbort("readAndIgnore: error reading socket after %"PRIu64" bytes", total);
+//    remaining -= rd;
+//    total += rd;
+//    }
+//if (total < size)
+//    errAbort("readAndIgnore: got EOF at %"PRIu64" bytes (wanted %"PRIu64")", total, size);
+//}
+////
+//static int connInfoGetSocket(struct connInfo *ci, char *url, bits64 offset, int size)
+///* If ci has an open socket and the given offset matches ci's current offset,
+// * reuse ci->socket.  Otherwise close the socket, open a new one, and update ci,
+// * or return -1 if there is an error opening a new one. */
+//{
+//if (ci != NULL && ci->socket > 0 && ci->offset != offset)
+//    {
+//    bits64 skipSize = (offset - ci->offset);
+//    if (skipSize > 0 && skipSize <= MAX_SKIP_TO_SAVE_RECONNECT)
+//	{
+//	verbose(2, "!! skipping %"PRIu64" bytes @%"PRIu64" to avoid reconnect\n", skipSize, ci->offset);
+//	readAndIgnore(ci->socket, skipSize);
+//	ci->offset = offset;
+//	}
+//    else
+//	{
+//	verbose(2, "Offset mismatch (ci %"PRIu64" != new %"PRIu64"), reopening.\n", ci->offset, offset);
+//	mustCloseFd(&(ci->socket));
+//	if (ci->ctrlSocket > 0)
+//	    mustCloseFd(&(ci->ctrlSocket));
+//	ZeroVar(ci);
+//	}
+//    }
+//int sd;
+//if (ci == NULL || ci->socket <= 0)
+//    {
+//    char rangeUrl[2048];
+//    if (ci == NULL)
+//	{
+//	safef(rangeUrl, sizeof(rangeUrl), "%s;byterange=%"PRIu64"-%"PRIu64"",
+//	      url, offset, (offset + size - 1));
+//	sd = netUrlOpen(rangeUrl);
+//	}
+//    else
+//	{
+//	safef(rangeUrl, sizeof(rangeUrl), "%s;byterange=%"PRIu64"-", url, offset);
+//	sd = ci->socket = netUrlOpenSockets(rangeUrl, &(ci->ctrlSocket));
+//	ci->offset = offset;
+//	}
+//    if (sd < 0)
+//	return -1;
+//    if (startsWith("http", url))
+//	{
+//	char *newUrl = NULL;
+//	int newSd = 0;
+//	if (!netSkipHttpHeaderLinesHandlingRedirect(sd, rangeUrl, &newSd, &newUrl))
+//	    return -1;
+//	if (newUrl)
+//	    {
+//	    freeMem(newUrl);
+//	    sd = newSd;
+//	    if (ci != NULL)
+//		ci->socket = newSd;
+//	    }
+//	}
+//    }
+//else
+//    sd = ci->socket;
+//return sd;
+//}
 
 /********* Section for local file protocol **********/
 
@@ -319,125 +319,125 @@ return TRUE;
 }
 
 /********* Section for http protocol **********/
-
-int udcDataViaHttpOrFtp(char *url, bits64 offset, int size, void *buffer, struct connInfo *ci)
-/* Fetch a block of data of given size into buffer using url's protocol,
- * which must be http, https or ftp.  Returns number of bytes actually read.
- * Does an errAbort on error.
- * Typically will be called with size in the 8k-64k range. */
-{
-if (startsWith("http://",url) || startsWith("https://",url) || startsWith("ftp://",url))
-    verbose(2, "reading http/https/ftp data - %d bytes at %"PRIu64" - on %s\n", size, offset, url);
-else
-    errAbort("Invalid protocol in url [%s] in udcDataViaFtp, only http, https, or ftp supported",
-	     url); 
-int sd = connInfoGetSocket(ci, url, offset, size);
-if (sd < 0)
-    errAbort("Can't get data socket for %s", url);
-int rd = 0, total = 0, remaining = size;
-char *buf = (char *)buffer;
-while ((remaining > 0) && ((rd = read(sd, buf, remaining)) > 0))
-    {
-    total += rd;
-    buf += rd;
-    remaining -= rd;
-    }
-if (rd == -1)
-    errnoAbort("udcDataViaHttpOrFtp: error reading socket");
-if (ci == NULL)
-    mustCloseFd(&sd);
-else
-    ci->offset += total;
-return total;
-}
-
-boolean udcInfoViaHttp(char *url, struct udcRemoteFileInfo *retInfo)
-/* Gets size and last modified time of URL
- * and returns status of HEAD GET. */
-{
-verbose(2, "checking http remote info on %s\n", url);
-struct hash *hash = newHash(0);
-int status = netUrlHead(url, hash);
-if (status != 200) // && status != 302 && status != 301)
-    return FALSE;
-char *sizeString = hashFindValUpperCase(hash, "Content-Length:");
-if (sizeString == NULL)
-    {
-    /* try to get remote file size by an alternate method */
-    long long retSize = netUrlSizeByRangeResponse(url);
-    if (retSize < 0)
-	{
-    	hashFree(&hash);
-	errAbort("No Content-Length: returned in header for %s, can't proceed, sorry", url);
-	}
-    retInfo->size = retSize;
-    }
-else
-    {
-    retInfo->size = atoll(sizeString);
-    }
-
-char *lastModString = hashFindValUpperCase(hash, "Last-Modified:");
-if (lastModString == NULL)
-    {
-    // Date is a poor substitute!  It will always appear that the cache is stale.
-    // But at least we can read files from dropbox.com.
-    lastModString = hashFindValUpperCase(hash, "Date:");
-    if (lastModString == NULL)
-	{
-	hashFree(&hash);
-	errAbort("No Last-Modified: or Date: returned in header for %s, can't proceed, sorry", url);
-	}
-    }
-struct tm tm;
-time_t t;
-// Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT
-// This will always be GMT
-if (strptime(lastModString, "%a, %d %b %Y %H:%M:%S %Z", &tm) == NULL)
-    { /* Handle error */;
-    hashFree(&hash);
-    errAbort("unable to parse last-modified string [%s]", lastModString);
-    }
-t = mktimeFromUtc(&tm);
-if (t == -1)
-    { /* Handle error */;
-    hashFree(&hash);
-    errAbort("mktimeFromUtc failed while converting last-modified string [%s] from UTC time", lastModString);
-    }
-retInfo->updateTime = t;
-
-hashFree(&hash);
-return status;
-}
+//
+//int udcDataViaHttpOrFtp(char *url, bits64 offset, int size, void *buffer, struct connInfo *ci)
+///* Fetch a block of data of given size into buffer using url's protocol,
+// * which must be http, https or ftp.  Returns number of bytes actually read.
+// * Does an errAbort on error.
+// * Typically will be called with size in the 8k-64k range. */
+//{
+//if (startsWith("http://",url) || startsWith("https://",url) || startsWith("ftp://",url))
+//    verbose(2, "reading http/https/ftp data - %d bytes at %"PRIu64" - on %s\n", size, offset, url);
+//else
+//    errAbort("Invalid protocol in url [%s] in udcDataViaFtp, only http, https, or ftp supported",
+//	     url);
+//int sd = connInfoGetSocket(ci, url, offset, size);
+//if (sd < 0)
+//    errAbort("Can't get data socket for %s", url);
+//int rd = 0, total = 0, remaining = size;
+//char *buf = (char *)buffer;
+//while ((remaining > 0) && ((rd = read(sd, buf, remaining)) > 0))
+//    {
+//    total += rd;
+//    buf += rd;
+//    remaining -= rd;
+//    }
+//if (rd == -1)
+//    errnoAbort("udcDataViaHttpOrFtp: error reading socket");
+//if (ci == NULL)
+//    mustCloseFd(&sd);
+//else
+//    ci->offset += total;
+//return total;
+//}
+//
+//boolean udcInfoViaHttp(char *url, struct udcRemoteFileInfo *retInfo)
+///* Gets size and last modified time of URL
+// * and returns status of HEAD GET. */
+//{
+//verbose(2, "checking http remote info on %s\n", url);
+//struct hash *hash = newHash(0);
+//int status = netUrlHead(url, hash);
+//if (status != 200) // && status != 302 && status != 301)
+//    return FALSE;
+//char *sizeString = hashFindValUpperCase(hash, "Content-Length:");
+//if (sizeString == NULL)
+//    {
+//    /* try to get remote file size by an alternate method */
+//    long long retSize = netUrlSizeByRangeResponse(url);
+//    if (retSize < 0)
+//	{
+//    	hashFree(&hash);
+//	errAbort("No Content-Length: returned in header for %s, can't proceed, sorry", url);
+//	}
+//    retInfo->size = retSize;
+//    }
+//else
+//    {
+//    retInfo->size = atoll(sizeString);
+//    }
+//
+//char *lastModString = hashFindValUpperCase(hash, "Last-Modified:");
+//if (lastModString == NULL)
+//    {
+//    // Date is a poor substitute!  It will always appear that the cache is stale.
+//    // But at least we can read files from dropbox.com.
+//    lastModString = hashFindValUpperCase(hash, "Date:");
+//    if (lastModString == NULL)
+//	{
+//	hashFree(&hash);
+//	errAbort("No Last-Modified: or Date: returned in header for %s, can't proceed, sorry", url);
+//	}
+//    }
+//struct tm tm;
+//time_t t;
+//// Last-Modified: Wed, 15 Nov 1995 04:58:08 GMT
+//// This will always be GMT
+//if (strptime(lastModString, "%a, %d %b %Y %H:%M:%S %Z", &tm) == NULL)
+//    { /* Handle error */;
+//    hashFree(&hash);
+//    errAbort("unable to parse last-modified string [%s]", lastModString);
+//    }
+//t = mktimeFromUtc(&tm);
+//if (t == -1)
+//    { /* Handle error */;
+//    hashFree(&hash);
+//    errAbort("mktimeFromUtc failed while converting last-modified string [%s] from UTC time", lastModString);
+//    }
+//retInfo->updateTime = t;
+//
+//hashFree(&hash);
+//return status;
+//}
 
 
 /********* Section for ftp protocol **********/
 
 // fetchData method: See udcDataViaHttpOrFtp above.
-
-boolean udcInfoViaFtp(char *url, struct udcRemoteFileInfo *retInfo)
-/* Gets size and last modified time of FTP URL */
-{
-verbose(2, "checking ftp remote info on %s\n", url);
-long long size = 0;
-time_t t, tUtc;
-struct tm *tm = NULL;
-// TODO: would be nice to add int *retCtrlSocket to netGetFtpInfo so we can stash 
-// in retInfo->connInfo and keep socket open.
-boolean ok = netGetFtpInfo(url, &size, &tUtc);
-if (!ok)
-    return FALSE;
-// Convert UTC to localtime
-tm = localtime(&tUtc);
-t = mktimeFromUtc(tm);
-if (t == -1)
-    { /* Handle error */;
-    errAbort("mktimeFromUtc failed while converting FTP UTC last-modified time %ld to local time", (long) tUtc);
-    }
-retInfo->size = size;
-retInfo->updateTime = t;
-return TRUE;
-}
+//
+//boolean udcInfoViaFtp(char *url, struct udcRemoteFileInfo *retInfo)
+///* Gets size and last modified time of FTP URL */
+//{
+//verbose(2, "checking ftp remote info on %s\n", url);
+//long long size = 0;
+//time_t t, tUtc;
+//struct tm *tm = NULL;
+//// TODO: would be nice to add int *retCtrlSocket to netGetFtpInfo so we can stash
+//// in retInfo->connInfo and keep socket open.
+//boolean ok = truenetGetFtpInfo(url, &size, &tUtc);
+//if (!ok)
+//    return FALSE;
+//// Convert UTC to localtime
+//tm = localtime(&tUtc);
+//t = mktimeFromUtc(tm);
+//if (t == -1)
+//    { /* Handle error */;
+//    errAbort("mktimeFromUtc failed while converting FTP UTC last-modified time %ld to local time", (long) tUtc);
+//    }
+//retInfo->size = size;
+//retInfo->updateTime = t;
+//return TRUE;
+//}
 
 
 /********* Non-protocol-specific bits **********/
@@ -594,13 +594,13 @@ else if (sameString(upToColon, "slow"))
     }
 else if (sameString(upToColon, "http") || sameString(upToColon, "https"))
     {
-    prot->fetchData = udcDataViaHttpOrFtp;
-    prot->fetchInfo = udcInfoViaHttp;
+/*    prot->fetchData = udcDataViaHttpOrFtp;
+    prot->fetchInfo = udcInfoViaHttp;*/
     }
 else if (sameString(upToColon, "ftp"))
     {
-    prot->fetchData = udcDataViaHttpOrFtp;
-    prot->fetchInfo = udcInfoViaFtp;
+//    prot->fetchData = udcDataViaHttpOrFtp;
+//    prot->fetchInfo = udcInfoViaFtp;
     }
 else if (sameString(upToColon, "transparent"))
     {
@@ -1648,37 +1648,37 @@ if (sameString("transparent", udc->protocol))
     }
 return udc->updateTime;
 }
-
-off_t udcFileSize(char *url)
-/* fetch file size from given URL or local path 
- * returns -1 if not found. */
-{
-if (udcIsLocal(url))
-    return fileSize(url);
-
-// don't go to the network if we can avoid it
-int cacheSize = udcSizeFromCache(url, NULL);
-if (cacheSize!=-1)
-    return cacheSize;
-
-off_t ret = -1;
-struct udcRemoteFileInfo info;
-
-if (startsWith("http://",url) || startsWith("https://",url))
-    {
-    if (udcInfoViaHttp(url, &info))
-	ret = info.size;
-    }
-else if (startsWith("ftp://",url))
-    {
-    if (udcInfoViaFtp(url, &info))
-	ret = info.size;
-    }
-else
-    errAbort("udc/udcFileSize: invalid protocol for url %s, can only do http/https/ftp", url);
-
-return ret;
-}
+//
+//off_t udcFileSize(char *url)
+///* fetch file size from given URL or local path
+// * returns -1 if not found. */
+//{
+//if (udcIsLocal(url))
+//    return fileSize(url);
+//
+//// don't go to the network if we can avoid it
+//int cacheSize = udcSizeFromCache(url, NULL);
+//if (cacheSize!=-1)
+//    return cacheSize;
+//
+//off_t ret = -1;
+//struct udcRemoteFileInfo info;
+//
+//if (startsWith("http://",url) || startsWith("https://",url))
+//    {
+//    if (udcInfoViaHttp(url, &info))
+//	ret = info.size;
+//    }
+//else if (startsWith("ftp://",url))
+//    {
+//    if (udcInfoViaFtp(url, &info))
+//	ret = info.size;
+//    }
+//else
+//    errAbort("udc/udcFileSize: invalid protocol for url %s, can only do http/https/ftp", url);
+//
+//return ret;
+//}
 
 boolean udcIsLocal(char *url) 
 /* return true if file is not a http or ftp file, just a local file */
@@ -1691,8 +1691,8 @@ freez(&afterProtocol);
 return colon==NULL;
 }
 
-boolean udcExists(char *url)
-/* return true if a local or remote file exists */
-{
-return udcFileSize(url)!=-1;
-}
+//boolean udcExists(char *url)
+///* return true if a local or remote file exists */
+//{
+//return udcFileSize(url)!=-1;
+//}
