@@ -13,8 +13,36 @@
 #include "linefile.h"
 #include "pipeline.h"
 #include "localmem.h"
-#include "cheapcgi.h"
+//#include "cheapcgi.h"
 #include "udc.h"
+
+
+void cgiDecode(char *in, char *out, int inLength)
+/* Decode from cgi pluses-for-spaces format to normal.
+ * Out will be a little shorter than in typically, and
+ * can be the same buffer. */
+{
+char c;
+int i;
+for (i=0; i<inLength;++i)
+    {
+    c = *in++;
+    if (c == '+')
+	*out++ = ' ';
+    else if (c == '%')
+	{
+	int code;
+        if (sscanf(in, "%2x", &code) != 1)
+	    code = '?';
+	in += 2;
+	i += 2;
+	*out++ = code;
+	}
+    else
+	*out++ = c;
+    }
+*out++ = 0;
+}
 
 char *getFileNameFromHdrSig(char *m)
 /* Check if header has signature of supported compression stream,
@@ -1020,10 +1048,10 @@ if (c != '-' && !isdigit(c))
 return atoi(ascii);
 }
 
-int lineFileCheckAllIntsNoAbort(char *s, void *val, 
-    boolean isSigned, int byteCount, char *typeString, boolean noNeg, 
+int lineFileCheckAllIntsNoAbort(char *s, void *val,
+    boolean isSigned, int byteCount, char *typeString, boolean noNeg,
     char *errMsg, int errMsgSize)
-/* Convert string to (signed) integer of the size specified.  
+/* Convert string to (signed) integer of the size specified.
  * Unlike atol assumes all of string is number, no trailing trash allowed.
  * Returns 0 if conversion possible, and value is returned in 'val'
  * Otherwise 1 for empty string or trailing chars, and 2 for numeric overflow,
@@ -1036,7 +1064,7 @@ int lineFileCheckAllIntsNoAbort(char *s, void *val,
 unsigned long long res = 0, oldRes = 0;
 boolean isMinus = FALSE;
 
-if ((byteCount != 1) 
+if ((byteCount != 1)
  && (byteCount != 2)
  && (byteCount != 4)
  && (byteCount != 8))
@@ -1044,7 +1072,7 @@ if ((byteCount != 1)
 
 unsigned long long limit = 0xFFFFFFFFFFFFFFFFULL >> (8*(8-byteCount));
 
-if (isSigned) 
+if (isSigned)
     limit >>= 1;
 
 char *p, *p0 = s;
@@ -1056,7 +1084,7 @@ if (*p0 == '-')
 	if (noNeg)
 	    {
 	    safef(errMsg, errMsgSize, "Negative value not allowed");
-	    return 4; 
+	    return 4;
 	    }
 	p0++;
 	++limit;
@@ -1065,7 +1093,7 @@ if (*p0 == '-')
     else
 	{
 	safef(errMsg, errMsgSize, "Unsigned %s may not begin with minus sign (-)", typeString);
-	return 3; 
+	return 3;
 	}
     }
 p = p0;
@@ -1075,19 +1103,19 @@ while ((*p >= '0') && (*p <= '9'))
     if (res < oldRes)
 	{
 	safef(errMsg, errMsgSize, "%s%s overflowed", isSigned ? "signed ":"", typeString);
-	return 2; 
+	return 2;
 	}
     oldRes = res;
     res += *p - '0';
     if (res < oldRes)
 	{
 	safef(errMsg, errMsgSize, "%s%s overflowed", isSigned ? "signed ":"", typeString);
-	return 2; 
+	return 2;
 	}
     if (res > limit)
 	{
 	safef(errMsg, errMsgSize, "%s%s overflowed, limit=%s%"PRIuMAX"", isSigned ? "signed ":"", typeString, isMinus ? "-" : "", (uintmax_t)limit);
-	return 2; 
+	return 2;
 	}
     oldRes = res;
     p++;
@@ -1197,7 +1225,7 @@ for (;;)
 	    errMsg, count, wordIx+1, lf->lineIx, lf->fileName, s);
 	}
     if (cArray) // NULL means validation only.
-	cArray += byteCount;  
+	cArray += byteCount;
     count++;
     if (e)  // restore input string
         *e++ = ',';

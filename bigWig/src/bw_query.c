@@ -1,6 +1,6 @@
 #include "bw_query.h"
 #include <string.h>
- #include <math.h>
+#include <math.h>
 #include "common.h"
 #include "bigWig.h"
 #include "localmem.h"
@@ -85,7 +85,7 @@ double bw_op_result_avg_bp(bwStepOpData * data, int step) {
 double bw_op_result_thresh(bwStepOpData * data, int step) {
   if (data->count == 0.0)
     return data->defaultValue;
-  
+
   if (data->total >= data->thresh)
     return 1.0;
   else
@@ -148,7 +148,7 @@ int bw_step_query_size(int start, int end, int step) {
   - mappability: pass vector of step sum of mappable values and use that as the step value
                  (or fill steps with NA if "step value" == 0)
 
-  - profile / optimize : 
+  - profile / optimize :
     - maybe rewrite this file in C++ and use a function template / functors for
       the different clear/add/result "traits"...
     - maybe move clipping to only the code that needs it
@@ -162,7 +162,7 @@ int bw_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, int star
   struct bbiInterval * intervals;
   int nIntervals;
   int size = bw_step_query_size(start, end, step);
-  int idx;     
+  int idx;
 
   data.defaultValue = gap_value;
   data.do_abs = do_abs;
@@ -171,17 +171,17 @@ int bw_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, int star
   /* collect bigWig intervals in range */
   intervals = bigWigIntervalQuery(bigwig, (char*) chrom, start, end, localMem); /* maybe always use the expanded interval ?? to simplify the code, or have an option in the op selection to picks one or the other ... */
   nIntervals = slCount(intervals);
-  
+
   /* initialize result vector */
   for (idx = 0; idx < size; ++idx)
     buffer[idx] = gap_value;
-  
+
   /* fill in values */
   if (nIntervals > 0) {
     struct bbiInterval * interval;
     double left, right;
     double i_size;
-   
+
     /* initialize */
     (*(op->clear))(&data);
     left = start;
@@ -192,9 +192,9 @@ int bw_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, int star
       if (((double)interval->start) >= right) {
         /* save current value */
         buffer[idx] = (*(op->result))(&data, step);
-        
+
         /* start next */
-        (*(op->clear))(&data);          
+        (*(op->clear))(&data);
 
         while (idx < size && ((double)interval->start) >= right) {
           ++idx;
@@ -208,16 +208,16 @@ int bw_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, int star
         i_size = interval_size(left, right, ((double)interval->start), ((double)interval->end));
         (*(op->add))(&data, i_size, interval->val);
       }
-      
+
       /* interval ends beyond or at the current step */
       if (((double)interval->end) >= right && idx < size) {
         do {
           /* save current value */
           buffer[idx] = (*(op->result))(&data, step);
-        
+
           /* start next */
           (*(op->clear))(&data);
-          
+
           ++idx;
           left += step;
           right += step;
@@ -231,13 +231,13 @@ int bw_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, int star
         }
       }
     }
-    
+
     if (idx < size)
       buffer[idx] = (*(op->result))(&data, step);
   }
-  
+
   lmCleanup(&localMem);
-  
+
   return nIntervals;
 }
 
@@ -246,21 +246,21 @@ int bw_chrom_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, in
   int n;
   int i, j, k;
   double * valptr;
-  
+
   struct bigWigValsOnChrom *chromVals = bigWigValsOnChromNew();
   bwStepOpData data;
-  
+
   data.defaultValue = gap_value;
   data.do_abs = do_abs;
-  
+
   if (!bigWigValsOnChromFetchData(chromVals, (char*) chrom, bigwig))
     return -1;
-  
+
   n = bw_step_query_size(0, chromVals->chromSize, step);
-  
+
   for (i = 0, j = 0, valptr=chromVals->valBuf; i < n; ++i) {
     (*(op->clear))(&data);
-    
+
     for (k = 0; k < step; ++k, ++j, ++valptr) {
       if (bitReadOne(chromVals->covBuf , j))
         (*(op->add))(&data, 1, *valptr);
@@ -268,7 +268,7 @@ int bw_chrom_step_query(bigWig_t * bigwig, bwStepOp * op, const char * chrom, in
 
     buffer[i] = (*(op->result))(&data, step);
   }
-  
+
   bigWigValsOnChromFree(&chromVals);
 
   return 0;

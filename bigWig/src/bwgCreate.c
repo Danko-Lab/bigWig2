@@ -1,11 +1,11 @@
-/* bwgCreate - create big wig files.  Implements write side of bwgInternal.h module. 
+/* bwgCreate - create big wig files.  Implements write side of bwgInternal.h module.
  * See the comment in bwgInternal.h for a description of the file format. */
 
 #include "common.h"
 #include "linefile.h"
 #include "hash.h"
 #include "errabort.h"
-#include "sqlNum.h"
+//#include "sqlNum.h"
 #include "sig.h"
 #include "zlibFace.h"
 #include "bPlusTree.h"
@@ -64,7 +64,7 @@ switch (section->type)
 	internalErr();
 	break;
     }
-int fixedSize = sizeof(section->chromId) + sizeof(section->start) + sizeof(section->end) + 
+int fixedSize = sizeof(section->chromId) + sizeof(section->start) + sizeof(section->end) +
      sizeof(section->itemStep) + sizeof(section->itemSpan) + sizeof(type) + sizeof(reserved8) +
      sizeof(section->itemCount);
 int bufSize = section->itemCount * itemSize + fixedSize;
@@ -184,7 +184,7 @@ return stepTypeLine(line);
 }
 
 static void parseFixedStepSection(struct lineFile *lf, boolean clipDontDie, struct lm *lm,
-	int itemsPerSlot, char *chrom, bits32 chromSize, bits32 span, bits32 sectionStart, 
+	int itemsPerSlot, char *chrom, bits32 chromSize, bits32 span, bits32 sectionStart,
 	bits32 step, struct bwgSection **pSectionList)
 /* Read the single column data in section until get to end. */
 {
@@ -332,7 +332,7 @@ for (item = itemList; item != NULL; )
     sizeLeft -= sectionSize;
 
     /* Convert from list to array representation. */
-    struct bwgVariableStepPacked *packed, *p;		
+    struct bwgVariableStepPacked *packed, *p;
     p = lmAllocArray(lm, packed, sectionSize);
     int i;
     for (i=0; i<sectionSize; ++i)
@@ -363,13 +363,13 @@ static unsigned parseUnsignedVal(struct lineFile *lf, char *var, char *val)
 {
 char c = val[0];
 if (!isdigit(c))
-    errAbort("Expecting numerical value for %s, got %s, line %d of %s", 
+    errAbort("Expecting numerical value for %s, got %s, line %d of %s",
     	var, val, lf->lineIx, lf->fileName);
 return sqlUnsigned(val);
 }
 
-static void parseSteppedSection(struct lineFile *lf, boolean clipDontDie, 
-	struct hash *chromSizeHash, char *initialLine, 
+static void parseSteppedSection(struct lineFile *lf, boolean clipDontDie,
+	struct hash *chromSizeHash, char *initialLine,
 	struct lm *lm, int itemsPerSlot, struct bwgSection **pSectionList)
 /* Parse out a variableStep or fixedStep section and add it to list, breaking it up as need be. */
 {
@@ -433,7 +433,7 @@ if (type == bwgTypeFixedStep)
 	errAbort("Missing step= setting line %d of %s\n", lf->lineIx, lf->fileName);
     if (span == 0)
 	span = step;
-    parseFixedStepSection(lf, clipDontDie, lm, itemsPerSlot, 
+    parseFixedStepSection(lf, clipDontDie, lm, itemsPerSlot,
     	chrom, chromSize, span, start-1, step, pSectionList);
     }
 else
@@ -444,7 +444,7 @@ else
 	errAbort("Extra step= setting line %d of %s\n", lf->lineIx, lf->fileName);
     if (span == 0)
 	span = 1;
-    parseVariableStepSection(lf, clipDontDie, lm, itemsPerSlot, 
+    parseVariableStepSection(lf, clipDontDie, lm, itemsPerSlot,
     	chrom, chromSize, span, pSectionList);
     }
 }
@@ -466,8 +466,8 @@ const struct bedGraphChrom *b = *((struct bedGraphChrom **)vb);
 return strcmp(a->name, b->name);
 }
 
-static void parseBedGraphSection(struct lineFile *lf, boolean clipDontDie, 
-	struct hash *chromSizeHash, struct lm *lm, 
+static void parseBedGraphSection(struct lineFile *lf, boolean clipDontDie,
+	struct hash *chromSizeHash, struct lm *lm,
 	int itemsPerSlot, struct bwgSection **pSectionList)
 /* Parse out bedGraph section until we get to something that is not in bedGraph format. */
 {
@@ -511,7 +511,7 @@ while (lineFileNextReal(lf, &line))
 
     /* Do sanity checking on coordinates. */
     if (item->start > item->end)
-        errAbort("bedGraph error: start (%u) after end line (%u) %d of %s.", 
+        errAbort("bedGraph error: start (%u) after end line (%u) %d of %s.",
 		item->start, item->end, lf->lineIx, lf->fileName);
     if (item->end > chrom->size)
 	{
@@ -575,7 +575,7 @@ for (chrom = chromList; chrom != NULL; chrom = chrom->next)
 	}
     }
 
-/* Free up hash, no longer needed. Free's chromList as a side effect since chromList is in 
+/* Free up hash, no longer needed. Free's chromList as a side effect since chromList is in
  * hash's memory. */
 hashFree(&chromHash);
 chromList = NULL;
@@ -584,7 +584,7 @@ chromList = NULL;
 void bwgMakeChromInfo(struct bwgSection *sectionList, struct hash *chromSizeHash,
 	int *retChromCount, struct bbiChromInfo **retChromArray,
 	int *retMaxChromNameSize)
-/* Fill in chromId field in sectionList.  Return array of chromosome name/ids. 
+/* Fill in chromId field in sectionList.  Return array of chromosome name/ids.
  * The chromSizeHash is keyed by name, and has int values. */
 {
 /* Build up list of unique chromosome names. */
@@ -635,7 +635,7 @@ static int bwgStrcmp (const void * A, const void * B) {
 void bwgMakeAllChromInfo(struct bwgSection *sectionList, struct hash *chromSizeHash,
 	int *retChromCount, struct bbiChromInfo **retChromArray,
 	int *retMaxChromNameSize)
-/* Fill in chromId field in sectionList.  Return array of chromosome name/ids. 
+/* Fill in chromId field in sectionList.  Return array of chromosome name/ids.
  * The chromSizeHash is keyed by name, and has int values. */
 {
 /* Build up list of unique chromosome names. */
@@ -677,7 +677,7 @@ for (section = sectionList; section != NULL; section = section->next)
         {
         for (i = 0; i < chromCount; ++i)
             {
-	    if (sameString(section->chrom, chromArray[i].name)) 
+	    if (sameString(section->chrom, chromArray[i].name))
 	        {
 		    section->chromId = i;
 	    	    break;
@@ -688,7 +688,7 @@ for (section = sectionList; section != NULL; section = section->next)
 	chromId = section->chromId;
 	name = section->chrom;
 	}
-    else 
+    else
 	section->chromId = chromId;
     }
 
@@ -795,19 +795,19 @@ for (section = sectionList; section != NULL; section = section->next)
 return total;
 }
 
-static void bwgReduceBedGraph(struct bwgSection *section, bits32 chromSize, int reduction, 
+static void bwgReduceBedGraph(struct bwgSection *section, bits32 chromSize, int reduction,
 	struct bbiSummary **pOutList)
 /*Reduce a bedGraph section onto outList. */
 {
 struct bwgBedGraphItem *item = section->items.bedGraphList;
 for (item = section->items.bedGraphList; item != NULL; item = item->next)
     {
-    bbiAddRangeToSummary(section->chromId, chromSize, item->start, item->end, 
+    bbiAddRangeToSummary(section->chromId, chromSize, item->start, item->end,
     	item->val, reduction, pOutList);
     }
 }
 
-static void bwgReduceVariableStep(struct bwgSection *section, bits32 chromSize, int reduction, 
+static void bwgReduceVariableStep(struct bwgSection *section, bits32 chromSize, int reduction,
 	struct bbiSummary **pOutList)
 /*Reduce a variableStep section onto outList. */
 {
@@ -815,13 +815,13 @@ struct bwgVariableStepPacked *items = section->items.variableStepPacked;
 int i;
 for (i=0; i<section->itemCount; ++i)
     {
-    bbiAddRangeToSummary(section->chromId, chromSize, 
+    bbiAddRangeToSummary(section->chromId, chromSize,
     	items->start, items->start + section->itemSpan, items->val, reduction, pOutList);
     items += 1;
     }
 }
 
-static void bwgReduceFixedStep(struct bwgSection *section, bits32 chromSize, int reduction, 
+static void bwgReduceFixedStep(struct bwgSection *section, bits32 chromSize, int reduction,
 	struct bbiSummary **pOutList)
 /*Reduce a fixedStep section onto outList. */
 {
@@ -830,14 +830,14 @@ int start = section->start;
 int i;
 for (i=0; i<section->itemCount; ++i)
     {
-    bbiAddRangeToSummary(section->chromId, chromSize, start, start + section->itemSpan, items->val, 
+    bbiAddRangeToSummary(section->chromId, chromSize, start, start + section->itemSpan, items->val,
     	reduction, pOutList);
     start += section->itemStep;
     items += 1;
     }
 }
 
-struct bbiSummary *bwgReduceSectionList(struct bwgSection *sectionList, 
+struct bbiSummary *bwgReduceSectionList(struct bwgSection *sectionList,
 	struct bbiChromInfo *chromInfoArray, int reduction)
 /* Return summary of section list reduced by given amount. */
 {
@@ -915,7 +915,7 @@ for (i=0; i<9; i++)
     reduction *= 4;
     if (reduction > 1000000000)
         break;
-    summaryList = bbiReduceSummaryList(reduceSummaries[*summaryCount-1], chromInfoArray, 
+    summaryList = bbiReduceSummaryList(reduceSummaries[*summaryCount-1], chromInfoArray,
     	reduction);
     summarySize = bbiTotalSummarySize(summaryList);
     if (summarySize != lastSummarySize)
@@ -936,7 +936,7 @@ static void bwgComputeFixedSummaries(struct bwgSection * sectionList, struct bbi
 // The last two values of this array were extrapolated following Jim's formula
 int i;
 #define REDUCTION_COUNT 10
-bits32 presetReductions[REDUCTION_COUNT] = {30, 65, 130, 260, 450, 648, 950, 1296, 4800, 19200}; 
+bits32 presetReductions[REDUCTION_COUNT] = {30, 65, 130, 260, 450, 648, 950, 1296, 4800, 19200};
 
 bits64 reduction = reductionAmounts[0] = presetReductions[0];
 reduceSummaries[0] = bwgReduceSectionList(sectionList, chromInfoArray, presetReductions[0]);
@@ -944,14 +944,14 @@ reduceSummaries[0] = bwgReduceSectionList(sectionList, chromInfoArray, presetRed
 for (i=1; i<REDUCTION_COUNT; i++)
     {
     reduction = reductionAmounts[i] = presetReductions[i];
-    reduceSummaries[i] = bbiReduceSummaryList(reduceSummaries[i-1], chromInfoArray, 
+    reduceSummaries[i] = bbiReduceSummaryList(reduceSummaries[i-1], chromInfoArray,
     	reduction);
     }
 
 *summaryCount = REDUCTION_COUNT;
 }
 
-void bwgCreate(struct bwgSection *sectionList, struct hash *chromSizeHash, 
+void bwgCreate(struct bwgSection *sectionList, struct hash *chromSizeHash,
 	int blockSize, int itemsPerSlot, boolean doCompress, boolean keepAllChromosomes,
         boolean fixedSummaries, char *fileName)
 /* Create a bigWig file out of a sorted sectionList. */
@@ -985,9 +985,9 @@ if (keepAllChromosomes)
 else
     bwgMakeChromInfo(sectionList, chromSizeHash, &chromCount, &chromInfoArray, &maxChromNameSize);
 
-if (fixedSummaries) 
+if (fixedSummaries)
     bwgComputeFixedSummaries(sectionList, reduceSummaries, &summaryCount, chromInfoArray, reductionAmounts);
-else 
+else
     bwgComputeDynamicSummaries(sectionList, reduceSummaries, &summaryCount, chromInfoArray, chromCount, reductionAmounts, doCompress);
 
 /* Write fixed header. */
@@ -1030,8 +1030,8 @@ bbiSummaryElementWrite(f, &totalSum);
 chromTreeOffset = ftell(f);
 int chromBlockSize = min(blockSize, chromCount);
 bptFileBulkIndexToOpenFile(chromInfoArray, sizeof(chromInfoArray[0]), chromCount, chromBlockSize,
-    bbiChromInfoKey, maxChromNameSize, bbiChromInfoVal, 
-    sizeof(chromInfoArray[0].id) + sizeof(chromInfoArray[0].size), 
+    bbiChromInfoKey, maxChromNameSize, bbiChromInfoVal,
+    sizeof(chromInfoArray[0].id) + sizeof(chromInfoArray[0].size),
     f);
 
 /* Write out data section count and sections themselves. */
@@ -1053,7 +1053,7 @@ AllocArray(sectionArray, sectionCount);
 for (section = sectionList, i=0; section != NULL; section = section->next, ++i)
     sectionArray[i] = section;
 cirTreeFileBulkIndexToOpenFile(sectionArray, sizeof(sectionArray[0]), sectionCount,
-    blockSize, 1, NULL, bwgSectionFetchKey, bwgSectionFetchOffset, 
+    blockSize, 1, NULL, bwgSectionFetchKey, bwgSectionFetchOffset,
     indexOffset, f);
 freez(&sectionArray);
 
@@ -1200,7 +1200,7 @@ void bigWigFileCreate(
 	boolean keepAllChromosomes,	/* If TRUE then store all chromosomes in chromosomal b-tree. */
 	boolean fixedSummaries,	/* If TRUE then impose fixed summary levels. */
 	char *outName)
-/* Convert ascii format wig file (in fixedStep, variableStep or bedGraph format) 
+/* Convert ascii format wig file (in fixedStep, variableStep or bedGraph format)
  * to binary big wig format. */
 {
 /* This code needs to agree with code in two other places currently - bigBedFileCreate,

@@ -1,8 +1,8 @@
 /* udc - url data cache - a caching system that keeps blocks of data fetched from URLs in
- * sparse local files for quick use the next time the data is needed. 
+ * sparse local files for quick use the next time the data is needed.
  *
  * This cache is enormously simplified by there being no local _write_ to the cache,
- * just reads.  
+ * just reads.
  *
  * The overall strategy of the implementation is to have a root cache directory
  * with a subdir for each file being cached.  The directory for a single cached file
@@ -16,7 +16,7 @@
  * URL, with some necessary escaping, is used to define the rest of the cache directory
  * structure, with each '/' after the protocol line translating into another directory
  * level.
- *    
+ *
  * The bitmap file contains time stamp and size data as well as an array with one bit
  * for each block of the file that has been fetched.  Currently the block size is 8K. */
 
@@ -29,7 +29,7 @@
 #include "portable.h"
 #include "sig.h"
 //#include "net.h"
-#include "cheapcgi.h"
+//#include "cheapcgi.h"
 #include "udc.h"
 
 
@@ -471,7 +471,7 @@ memcpy(path+dirLen+1, fileName, nameLen);
 return path;
 }
 
-static void udcNewCreateBitmapAndSparse(struct udcFile *file, 
+static void udcNewCreateBitmapAndSparse(struct udcFile *file,
 	bits64 remoteUpdate, bits64 remoteSize, bits32 version)
 /* Create a new bitmap file around the given remoteUpdate time. */
 {
@@ -531,7 +531,7 @@ struct stat status;
 fstat(fd, &status);
 
 /* Read signature and decide if byte-swapping is needed. */
-// TODO: maybe buffer the I/O for performance?  Don't read past header - 
+// TODO: maybe buffer the I/O for performance?  Don't read past header -
 // fd offset needs to point to first data block when we return.
 bits32 magic;
 boolean isSwapped = FALSE;
@@ -685,7 +685,7 @@ if (file->size > 0)
     int initialCachedBlocks = bitFindClear(&b, 0, endBlock);
     file->endData = initialCachedBlocks * udcBlockSize;
     mustLseek(bits->fd, wasAt, SEEK_SET);
-    } 
+    }
 
 file->bits = bits;
 
@@ -736,7 +736,7 @@ return output;
 void udcParseUrlFull(char *url, char **retProtocol, char **retAfterProtocol, char **retColon,
 		     char **retAuth)
 /* Parse the URL into components that udc treats separately.
- * *retAfterProtocol is Q-encoded to keep special chars out of filenames.  
+ * *retAfterProtocol is Q-encoded to keep special chars out of filenames.
  * Free all *ret's except *retColon when done. */
 {
 char *protocol, *afterProtocol;
@@ -778,7 +778,7 @@ afterProtocol = qEncode(afterProtocol);
 
 void udcParseUrl(char *url, char **retProtocol, char **retAfterProtocol, char **retColon)
 /* Parse the URL into components that udc treats separately.
- * *retAfterProtocol is Q-encoded to keep special chars out of filenames.  
+ * *retAfterProtocol is Q-encoded to keep special chars out of filenames.
  * Free  *retProtocol and *retAfterProtocol but not *retColon when done. */
 {
 udcParseUrlFull(url, retProtocol, retAfterProtocol, retColon, NULL);
@@ -1108,7 +1108,7 @@ while (nextClearBit < partBitEnd)
 return gotUnset;
 }
 
-static void fetchMissingBlocks(struct udcFile *file, struct udcBitmap *bits, 
+static void fetchMissingBlocks(struct udcFile *file, struct udcBitmap *bits,
 	int startBlock, int blockCount, int blockSize)
 /* Fetch missing blocks from remote and put them into file.  errAbort if trouble. */
 {
@@ -1120,7 +1120,7 @@ if (endPos > startPos)
     {
     bits64 readSize = endPos - startPos;
     void *buf = needLargeMem(readSize);
-    
+
     int actualSize = file->prot->fetchData(file->url, startPos, readSize, buf, &(file->connInfo));
     if (actualSize != readSize)
 	errAbort("unable to fetch %"PRIu64" bytes from %s @%"PRIu64" (got %d bytes)",
@@ -1215,7 +1215,7 @@ file->endData = fetchedEnd;
 }
 
 static boolean udcCachePreload(struct udcFile *file, bits64 offset, bits64 size)
-/* Make sure that given data is in cache - fetching it remotely if need be. 
+/* Make sure that given data is in cache - fetching it remotely if need be.
  * Return TRUE on success. */
 {
 boolean ok = TRUE;
@@ -1237,7 +1237,7 @@ for (s = offset; s < endPos; s = e)
     else
 	{
 	ok = FALSE;
-	verbose(2, "udcCachePreload version check failed %d vs %d", 
+	verbose(2, "udcCachePreload version check failed %d vs %d",
 		bits->version, file->bitmapVersion);
 	}
     if (!ok)
@@ -1417,7 +1417,7 @@ char shortBuf[2], *longBuf = NULL, *buf = shortBuf;
 int i, bufSize = sizeof(shortBuf);
 for (i=0; ; ++i)
     {
-    /* See if need to expand buffer, which is initially on stack, but if it gets big goes into 
+    /* See if need to expand buffer, which is initially on stack, but if it gets big goes into
      * heap. */
     if (i >= bufSize)
         {
@@ -1452,7 +1452,7 @@ char shortBuf[2], *longBuf = NULL, *buf = shortBuf;
 int i, bufSize = sizeof(shortBuf);
 for (i=0; ; ++i)
     {
-    /* See if need to expand buffer, which is initially on stack, but if it gets big goes into 
+    /* See if need to expand buffer, which is initially on stack, but if it gets big goes into
      * heap. */
     if (i >= bufSize)
         {
@@ -1571,7 +1571,7 @@ for (file = fileList; file != NULL; file = file->next)
 	    verbose(2, "%ld (%ld) %s/%s\n", bitRealDataSize(file->name), (long)file->size, getCurrentDir(), file->name);
 	if (file->lastAccess < deleteTime)
 	    {
-	    /* Remove all files when get bitmap, so that can ensure they are deleted in 
+	    /* Remove all files when get bitmap, so that can ensure they are deleted in
 	     * right order. */
 	    results += file->size;
 	    if (!testOnly)
@@ -1680,7 +1680,7 @@ return udc->updateTime;
 //return ret;
 //}
 
-boolean udcIsLocal(char *url) 
+boolean udcIsLocal(char *url)
 /* return true if file is not a http or ftp file, just a local file */
 {
 // copied from above

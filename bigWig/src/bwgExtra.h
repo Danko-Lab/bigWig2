@@ -18,7 +18,7 @@
 #include "dystring.h"
 #include "bPlusTree.h"
 #include "cirTree.h"
-#include "rangeTree.h"
+//#include "rangeTree.h"
 #include "udc.h"
 #include "zlibFace.h"
 #include "bbiFile.h"

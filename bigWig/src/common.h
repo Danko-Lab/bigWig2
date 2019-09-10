@@ -58,7 +58,7 @@
 
 #ifdef __WIN32__
 #define NO_SYSLOG 1
- 
+
 #define sleep(seconds) Sleep((seconds)*1000)
 int _mkdir(const char * dirname);
 int setenv(const char *name, const char *value, int overwrite);
@@ -1497,5 +1497,9 @@ char *dateAddTo(char *date,char *format,int addYears,int addMonths,int addDays);
 
 boolean haplotype(const char *name);
 /* Is this name a haplotype name ?  _hap or _alt in the name */
+
+//COpy from sqlNum.h
+unsigned sqlUnsigned(char *s);
+
 
 #endif /* COMMON_H */

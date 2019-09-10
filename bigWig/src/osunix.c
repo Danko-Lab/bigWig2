@@ -1,4 +1,4 @@
-/* Some wrappers around operating-system specific stuff. 
+/* Some wrappers around operating-system specific stuff.
  *
  * This file is copyright 2002 Jim Kent, but license is hereby
  * granted for all use - public, private or commercial. */
@@ -11,7 +11,7 @@
 #include <pwd.h>
 #include <termios.h>
 #include "portable.h"
-#include "portimpl.h"
+//#include "portimpl.h"
 #include <sys/wait.h>
 #include <regex.h>
 #include <utime.h>
@@ -104,7 +104,7 @@ return chdir(newDir) == 0;
 }
 
 struct slName *listDir(char *dir, char *pattern)
-/* Return an alphabetized list of all files that match 
+/* Return an alphabetized list of all files that match
  * the wildcard pattern in directory. */
 {
 struct slName *list = NULL, *name;
@@ -131,7 +131,7 @@ return list;
 }
 
 struct slName *listDirRegEx(char *dir, char *regEx, int flags)
-/* Return an alphabetized list of all files that match 
+/* Return an alphabetized list of all files that match
  * the regular expression pattern in directory.
  * See REGCOMP(3) for flags (e.g. REG_ICASE)  */
 {
@@ -163,12 +163,12 @@ slNameSort(&list);
 return list;
 }
 
-struct fileInfo *newFileInfo(char *name, off_t size, bool isDir, int statErrno, 
+struct fileInfo *newFileInfo(char *name, off_t size, bool isDir, int statErrno,
 	time_t lastAccess)
 /* Return a new fileInfo. */
 {
 int len = strlen(name);
-struct fileInfo *fi = needMem(sizeof(*fi) + len);
+struct fileInfo *fi = needMem(sizeof(struct fileInfo) + len);
 fi->size = size;
 fi->isDir = isDir;
 fi->statErrno = statErrno;
@@ -394,15 +394,15 @@ while ((c = *s++) != 0)
 }
 
 static void eatExcessDotDotInPath(char *path)
-/* If there's a /.. in path take it out.  Turns 
+/* If there's a /.. in path take it out.  Turns
  *      'this/long/../dir/file' to 'this/dir/file
  * and
- *      'this/../file' to 'file'  
+ *      'this/../file' to 'file'
  *
  * and
  *      'this/long/..' to 'this'
  * and
- *      'this/..' to  ''   
+ *      'this/..' to  ''
  * and
  *       /this/..' to '/' */
 {
@@ -419,7 +419,7 @@ for (;;)
     char *excessStart = matchingCharBeforeInLimits(path, excess, '/');
     if (excessStart == NULL) /* Preceding '/' not found */
          excessStart = path;
-    else 
+    else
          excessStart += 1;
     strcpy(excessStart, excessEnd);
     }
@@ -433,7 +433,7 @@ if (endsWith(path, "/.."))
 	char *excessStart = matchingCharBeforeInLimits(path, path+len-3, '/');
 	if (excessStart == NULL) /* Preceding '/' not found */
 	     excessStart = path;
-	else 
+	else
 	     excessStart += 1;
 	*excessStart = 0;
 	}
@@ -441,7 +441,7 @@ if (endsWith(path, "/.."))
 }
 
 char *simplifyPathToDir(char *path)
-/* Return path with ~ and .. taken out.  Also any // or trailing /.   
+/* Return path with ~ and .. taken out.  Also any // or trailing /.
  * freeMem result when done. */
 {
 /* Expand ~ if any with result in newPath */
@@ -580,7 +580,7 @@ fflush(stderr);
 _exit(1);  // Let the parent know that the child failed by returning 1.
 
 /* Explanation:
-_exit() is not the normal exit().  
+_exit() is not the normal exit().
 _exit() avoids the usual atexit() cleanup.
 The MySQL library that we link to uses atexit() cleanup to close any open MySql connections.
 However, because the child's mysql connections are shared by the parent,
@@ -664,7 +664,7 @@ va_end(args);
 
 boolean maybeTouchFile(char *fileName)
 /* If file exists, set its access and mod times to now.  If it doesn't exist, create it.
- * Return FALSE if we have a problem doing so (e.g. when qateam is gdb'ing and code tries 
+ * Return FALSE if we have a problem doing so (e.g. when qateam is gdb'ing and code tries
  * to touch some file owned by www). */
 {
 if (fileExists(fileName))

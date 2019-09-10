@@ -3,7 +3,7 @@
 #include "common.h"
 #include "hash.h"
 #include "linefile.h"
-#include "sqlNum.h"
+//#include "sqlNum.h"
 #include "zlibFace.h"
 #include "cirTree.h"
 #include "bPlusTree.h"
@@ -73,8 +73,8 @@ if (chromCount > 0)
 /* Write chromosome bPlusTree */
 int chromBlockSize = min(blockSize, chromCount);
 bptFileBulkIndexToOpenFile(chromInfoArray, sizeof(chromInfoArray[0]), chromCount, chromBlockSize,
-    bbiChromInfoKey, maxChromNameSize, bbiChromInfoVal, 
-    sizeof(chromInfoArray[0].id) + sizeof(chromInfoArray[0].size), 
+    bbiChromInfoKey, maxChromNameSize, bbiChromInfoVal,
+    sizeof(chromInfoArray[0].id) + sizeof(chromInfoArray[0].size),
     f);
 
 freeMem(chromInfoArray);
@@ -164,7 +164,7 @@ for (i=0; i<eim->indexCount; ++i)
     }
 }
 
-struct bbiChromUsage *bbiChromUsageFromBedFile(struct lineFile *lf, struct hash *chromSizesHash, 
+struct bbiChromUsage *bbiChromUsageFromBedFile(struct lineFile *lf, struct hash *chromSizesHash,
 	struct bbExIndexMaker *eim, int *retMinDiff, double *retAveSize, bits64 *retBedCount)
 /* Go through bed file and collect chromosomes and statistics.  If eim parameter is non-NULL
  * collect max field sizes there too. */
@@ -244,7 +244,7 @@ freeHash(&uniqHash);
 return usageList;
 }
 
-int bbiCalcResScalesAndSizes(int aveSize, 
+int bbiCalcResScalesAndSizes(int aveSize,
     int resScales[bbiMaxZoomLevels], int resSizes[bbiMaxZoomLevels])
 /* Fill in resScales with amount to zoom at each level, and zero out resSizes based
  * on average span. Returns the number of zoom levels we actually will use. */
@@ -261,9 +261,9 @@ for (resTry = 0; resTry < resTryCount; ++resTry)
     resScales[resTry] = res;
     // if aveSize is large, then the initial value of res is large, and we
     // and we cannot do all 10 levels without overflowing res* integers and other related variables.
-    if (res > 1000000000) 
+    if (res > 1000000000)
 	{
-	resTryCount = resTry + 1;  
+	resTryCount = resTry + 1;
 	verbose(2, "resTryCount reduced from 10 to %d\n", resTryCount);
 	break;
 	}
@@ -287,7 +287,7 @@ int bbiWriteZoomLevels(
     bits64 zoomDataOffsets[bbiMaxZoomLevels],  /* Fills in where data starts for each zoom level. */
     bits64 zoomIndexOffsets[bbiMaxZoomLevels], /* Fills in where index starts for each level. */
     struct bbiSummaryElement *totalSum)
-/* Write out all the zoom levels and return the number of levels written.  Writes 
+/* Write out all the zoom levels and return the number of levels written.  Writes
  * actual zoom amount and the offsets of the zoomed data and index in the last three
  * parameters.  Sorry for all the parameters - it was this or duplicate a big chunk of
  * code between bedToBigBed and bedGraphToBigWig. */
@@ -311,7 +311,7 @@ for (resTry = 0; resTry < resTryCount; ++resTry)
 	break;
 	}
     }
-verbose(2, "initialReduction %d, initialReducedCount = %d\n", 
+verbose(2, "initialReduction %d, initialReducedCount = %d\n",
     initialReduction, initialReducedCount);
 
 /* Force there to always be at least one zoom.  It may waste a little space on small
@@ -329,7 +329,7 @@ int zoomIncrement = bbiResIncrement;
 lineFileRewind(lf);
 struct bbiSummary *rezoomedList = writeReducedOnceReturnReducedTwice(usageList, fieldCount,
 	lf, initialReduction, initialReducedCount,
-	zoomIncrement, blockSize, itemsPerSlot, doCompress, lm, 
+	zoomIncrement, blockSize, itemsPerSlot, doCompress, lm,
 	f, &zoomDataOffsets[0], &zoomIndexOffsets[0], totalSum);
 verboseTime(2, "writeReducedOnceReturnReducedTwice");
 zoomAmounts[0] = initialReduction;
@@ -345,7 +345,7 @@ while (zoomLevels < bbiMaxZoomLevels)
 	break;
     zoomCount = rezoomCount;
     zoomDataOffsets[zoomLevels] = ftell(f);
-    zoomIndexOffsets[zoomLevels] = bbiWriteSummaryAndIndex(rezoomedList, 
+    zoomIndexOffsets[zoomLevels] = bbiWriteSummaryAndIndex(rezoomedList,
 	blockSize, itemsPerSlot, doCompress, f);
     zoomAmounts[zoomLevels] = reduction;
     ++zoomLevels;
@@ -373,8 +373,8 @@ return count;
 }
 
 
-void bbiAddToSummary(bits32 chromId, bits32 chromSize, bits32 start, bits32 end, 
-	bits32 validCount, double minVal, double maxVal, double sumData, double sumSquares,  
+void bbiAddToSummary(bits32 chromId, bits32 chromSize, bits32 start, bits32 end,
+	bits32 validCount, double minVal, double maxVal, double sumData, double sumSquares,
 	int reduction, struct bbiSummary **pOutList)
 /* Add data range to summary - putting it onto top of list if possible, otherwise
  * expanding list. */
@@ -405,7 +405,7 @@ while (start < end)
 
     /* Figure out amount of overlap between current summary and item */
     int overlap = rangeIntersection(start, end, sum->start, sum->end);
-    if (overlap <= 0) 
+    if (overlap <= 0)
 	{
         warn("%u %u doesn't intersect %u %u, chromId %u chromSize %u", start, end, sum->start, sum->end, chromId, chromSize);
 	internalErr();
@@ -427,7 +427,7 @@ while (start < end)
     }
 }
 
-void bbiAddRangeToSummary(bits32 chromId, bits32 chromSize, bits32 start, bits32 end, 
+void bbiAddRangeToSummary(bits32 chromId, bits32 chromSize, bits32 start, bits32 end,
 	double val, int reduction, struct bbiSummary **pOutList)
 /* Add chromosome range to summary - putting it onto top of list if possible, otherwise
  * expanding list. */
@@ -438,7 +438,7 @@ double sumSquares = sum*val;
 bbiAddToSummary(chromId, chromSize, start, end, size, val, val, sum, sumSquares, reduction, pOutList);
 }
 
-struct bbiSummary *bbiReduceSummaryList(struct bbiSummary *inList, 
+struct bbiSummary *bbiReduceSummaryList(struct bbiSummary *inList,
 	struct bbiChromInfo *chromInfoArray, int reduction)
 /* Reduce summary list to another summary list. */
 {
@@ -481,7 +481,7 @@ return res;
 }
 
 
-static bits64 bbiWriteSummaryAndIndexComp(struct bbiSummary *summaryList, 
+static bits64 bbiWriteSummaryAndIndexComp(struct bbiSummary *summaryList,
 	int blockSize, int itemsPerSlot, FILE *f)
 /* Write out summary and index to summary uncompressed, returning start position of
  * summary index. */
@@ -535,13 +535,13 @@ while (itemsLeft > 0)
     }
 bits64 indexOffset = ftell(f);
 cirTreeFileBulkIndexToOpenFile(summaryArray, sizeof(summaryArray[0]), count,
-    blockSize, itemsPerSlot, NULL, bbiSummaryFetchKey, bbiSummaryFetchOffset, 
+    blockSize, itemsPerSlot, NULL, bbiSummaryFetchKey, bbiSummaryFetchOffset,
     indexOffset, f);
 freez(&summaryArray);
 return indexOffset;
 }
 
-static bits64 bbiWriteSummaryAndIndexUnc(struct bbiSummary *summaryList, 
+static bits64 bbiWriteSummaryAndIndexUnc(struct bbiSummary *summaryList,
 	int blockSize, int itemsPerSlot, FILE *f)
 /* Write out summary and index to summary compressed, returning start position of
  * summary index. */
@@ -566,13 +566,13 @@ for (summary = summaryList, i=0; summary != NULL; summary = summary->next, ++i)
     }
 bits64 indexOffset = ftell(f);
 cirTreeFileBulkIndexToOpenFile(summaryArray, sizeof(summaryArray[0]), count,
-    blockSize, itemsPerSlot, NULL, bbiSummaryFetchKey, bbiSummaryFetchOffset, 
+    blockSize, itemsPerSlot, NULL, bbiSummaryFetchKey, bbiSummaryFetchOffset,
     indexOffset, f);
 freez(&summaryArray);
 return indexOffset;
 }
 
-bits64 bbiWriteSummaryAndIndex(struct bbiSummary *summaryList, 
+bits64 bbiWriteSummaryAndIndex(struct bbiSummary *summaryList,
 	int blockSize, int itemsPerSlot, boolean doCompress, FILE *f)
 /* Write out summary and index to summary, returning start position of
  * summary index. */
@@ -658,13 +658,13 @@ a->sumSquares = sum->sumSquares;
 elCount += 1;
 stream->elCount = elCount;
 if (elCount >= stream->allocCount)
-    bbiSumOutStreamFlush(stream);    
+    bbiSumOutStreamFlush(stream);
 }
 
-void bbiOutputOneSummaryFurtherReduce(struct bbiSummary *sum, 
-	struct bbiSummary **pTwiceReducedList, 
-	int doubleReductionSize, struct bbiBoundsArray **pBoundsPt, 
-	struct bbiBoundsArray *boundsEnd, struct lm *lm, 
+void bbiOutputOneSummaryFurtherReduce(struct bbiSummary *sum,
+	struct bbiSummary **pTwiceReducedList,
+	int doubleReductionSize, struct bbiBoundsArray **pBoundsPt,
+	struct bbiBoundsArray *boundsEnd, struct lm *lm,
 	struct bbiSumOutStream *stream)
 /* Write out sum to file, keeping track of minimal info on it in *pBoundsPt, and also adding
  * it to second level summary. */
@@ -685,7 +685,7 @@ bbiSumOutStreamWrite(stream, sum);
 
 /* Fold summary info into pTwiceReducedList. */
 struct bbiSummary *twiceReduced = *pTwiceReducedList;
-if (twiceReduced == NULL || twiceReduced->chromId != sum->chromId 
+if (twiceReduced == NULL || twiceReduced->chromId != sum->chromId
 	|| twiceReduced->start + doubleReductionSize < sum->end)
     {
     lmAllocVar(lm, twiceReduced);

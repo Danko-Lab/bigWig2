@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include <unistd.h>
-#include "portable.h"
+//#include "portable.h"
 #include "localmem.h"
 #include "hash.h"
 #include "obscure.h"
