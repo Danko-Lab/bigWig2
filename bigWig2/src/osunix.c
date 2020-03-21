@@ -7,7 +7,7 @@
 #include <dirent.h>
 //#include <sys/utsname.h>
 #include <sys/time.h>
-#include <sys/statvfs.h>
+//#include <sys/statvfs.h>
 #include <pwd.h>
 #include <termios.h>
 #include "portable.h"
@@ -32,16 +32,18 @@ if (stat(pathname,&mystat)==-1)
 return mystat.st_size;
 }
 
-long long freeSpaceOnFileSystem(char *path)
+
+//long long freeSpaceOnFileSystem(char *path)
 /* Given a path to a file or directory on a file system,  return free space
  * in bytes. */
-{
+/*{
 struct statvfs fi;
 int err = statvfs(path,&fi);
 if (err < 0)
     errnoAbort("freeSpaceOnFileSystem could not statvfs");
 return (long long)fi.f_bsize * fi.f_bavail;
-}
+}*/
+
 
 long clock1000()
 /* A millisecond clock. */
