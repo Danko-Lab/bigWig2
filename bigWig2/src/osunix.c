@@ -12,7 +12,7 @@
 //#include <termios.h>
 #include "portable.h"
 //#include "portimpl.h"
-#include <sys/wait.h>
+//#include <sys/wait.h>
 #include <regex.h>
 #include <utime.h>
 
@@ -613,12 +613,12 @@ childExecFailedExit(cmd[0]); // cannot use the normal errAbort.
 
 }
 
-void vaDumpStack(char *format, va_list args)
+//void vaDumpStack(char *format, va_list args)
 /* debugging function to run the pstack program on the current process. In
  * prints a message, following by a new line, and then the stack track.  Just
  * prints errors to stderr rather than aborts. For debugging purposes
  * only.  */
-{
+/*{
 static boolean inDumpStack = FALSE;  // don't allow re-entry if called from error handler
 if (inDumpStack)
     return;
@@ -651,7 +651,7 @@ else
         fprintf(stderr, "pstack signaled %d\n", WTERMSIG(wstat));
     }
 inDumpStack = FALSE;
-}
+}*/
 
 void dumpStack(char *format, ...)
 /* debugging function to run the pstack program on the current process. In
@@ -661,7 +661,8 @@ void dumpStack(char *format, ...)
 {
 va_list args;
 va_start(args, format);
-vaDumpStack(format, args);
+//This function is removed due to the compatibility with Windows
+//vaDumpStack(format, args);
 va_end(args);
 }
 
