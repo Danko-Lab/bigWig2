@@ -8,7 +8,7 @@
 //#include <sys/utsname.h>
 #include <sys/time.h>
 //#include <sys/statvfs.h>
-#include <pwd.h>
+//#include <pwd.h>
 #include <termios.h>
 #include "portable.h"
 //#include "portimpl.h"
@@ -520,15 +520,15 @@ assert(sameString(simplifyPathToDir("a/b///"),"a/b"));
 }
 #endif /* DEBUG */
 
-char *getUser()
+//char *getUser()
 /* Get user name */
-{
+/*{
 uid_t uid = geteuid();
 struct passwd *pw = getpwuid(uid);
 if (pw == NULL)
     errnoAbort("getUser: can't get user name for uid %d", (int)uid);
 return pw->pw_name;
-}
+}*/
 
 int mustFork()
 /* Fork or abort. */
