@@ -1,1 +1,1 @@
-cat(find.package("bigWig"))
+cat(find.package("bigWig2"))

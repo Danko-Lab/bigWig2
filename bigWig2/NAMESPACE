@@ -1,4 +1,4 @@
-useDynLib(bigwig, bigWig_load, bigWig_unload, bigWig_query, foreach_bed, bigWig_probe_query, bigWig_bp_query, bigWig_bp_chrom_query, bwMap_bp_query, stack_bed)
+useDynLib(bigWig2, bigWig_load, bigWig_unload, bigWig_query, foreach_bed, bigWig_probe_query, bigWig_bp_query, bigWig_bp_chrom_query, bwMap_bp_query, stack_bed)
 export(load.bigWig)
 export(unload.bigWig)
 export(query.bigWig)
