@@ -5,7 +5,7 @@
 
 #include "common.h"
 #include <dirent.h>
-#include <sys/utsname.h>
+//#include <sys/utsname.h>
 #include <sys/time.h>
 #include <sys/statvfs.h>
 #include <pwd.h>
@@ -16,6 +16,7 @@
 #include <regex.h>
 #include <utime.h>
 
+#include "osunix.h"
 
 
 
