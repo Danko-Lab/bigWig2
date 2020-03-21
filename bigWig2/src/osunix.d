@@ -5,18 +5,17 @@
 
 #include "common.h"
 #include <dirent.h>
-//#include <sys/utsname.h>
+#include <sys/utsname.h>
 #include <sys/time.h>
-//#include <sys/statvfs.h>
-//#include <pwd.h>
-//#include <termios.h>
+#include <sys/statvfs.h>
+#include <pwd.h>
+#include <termios.h>
 #include "portable.h"
 //#include "portimpl.h"
-//#include <sys/wait.h>
-//#include <regex.h>
+#include <sys/wait.h>
+#include <regex.h>
 #include <utime.h>
 
-#include "osunix.h"
 
 
 
@@ -32,18 +31,16 @@ if (stat(pathname,&mystat)==-1)
 return mystat.st_size;
 }
 
-
-//long long freeSpaceOnFileSystem(char *path)
+long long freeSpaceOnFileSystem(char *path)
 /* Given a path to a file or directory on a file system,  return free space
  * in bytes. */
-/*{
+{
 struct statvfs fi;
 int err = statvfs(path,&fi);
 if (err < 0)
     errnoAbort("freeSpaceOnFileSystem could not statvfs");
 return (long long)fi.f_bsize * fi.f_bavail;
-}*/
-
+}
 
 long clock1000()
 /* A millisecond clock. */
@@ -133,11 +130,11 @@ slNameSort(&list);
 return list;
 }
 
-//struct slName *listDirRegEx(char *dir, char *regEx, int flags)
+struct slName *listDirRegEx(char *dir, char *regEx, int flags)
 /* Return an alphabetized list of all files that match
  * the regular expression pattern in directory.
  * See REGCOMP(3) for flags (e.g. REG_ICASE)  */
-/*{
+{
 struct slName *list = NULL, *name;
 struct dirent *de;
 DIR *d;
@@ -164,7 +161,7 @@ closedir(d);
 regfree(&re);
 slNameSort(&list);
 return list;
-}*/
+}
 
 struct fileInfo *newFileInfo(char *name, off_t size, bool isDir, int statErrno,
 	time_t lastAccess)
@@ -520,15 +517,15 @@ assert(sameString(simplifyPathToDir("a/b///"),"a/b"));
 }
 #endif /* DEBUG */
 
-//char *getUser()
+char *getUser()
 /* Get user name */
-/*{
+{
 uid_t uid = geteuid();
 struct passwd *pw = getpwuid(uid);
 if (pw == NULL)
     errnoAbort("getUser: can't get user name for uid %d", (int)uid);
 return pw->pw_name;
-}*/
+}
 
 int mustFork()
 /* Fork or abort. */
@@ -539,32 +536,32 @@ if (childId == -1)
 return childId;
 }
 
-//int rawKeyIn()
+int rawKeyIn()
 /* Read in an unbuffered, unechoed character from keyboard. */
-//{
-//struct termios attr;
-//tcflag_t old;
-//char c;
+{
+struct termios attr;
+tcflag_t old;
+char c;
 
 /* Set terminal to non-echoing non-buffered state. */
-//if (tcgetattr(STDIN_FILENO, &attr) != 0)
-//    errAbort("Couldn't do tcgetattr");
-//old = attr.c_lflag;
-//attr.c_lflag &= ~ICANON;
-//attr.c_lflag &= ~ECHO;
-//if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-//    errAbort("Couldn't do tcsetattr");
+if (tcgetattr(STDIN_FILENO, &attr) != 0)
+    errAbort("Couldn't do tcgetattr");
+old = attr.c_lflag;
+attr.c_lflag &= ~ICANON;
+attr.c_lflag &= ~ECHO;
+if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
+    errAbort("Couldn't do tcsetattr");
 
 /* Read one byte */
-//if (read(STDIN_FILENO,&c,1) != 1)
-//   errnoAbort("rawKeyIn: I/O error");
+if (read(STDIN_FILENO,&c,1) != 1)
+   errnoAbort("rawKeyIn: I/O error");
 
 /* Put back terminal to how it was. */
-//attr.c_lflag = old;
-//if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-//    errAbort("Couldn't do tcsetattr2");
-//return c;
-//}
+attr.c_lflag = old;
+if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
+    errAbort("Couldn't do tcsetattr2");
+return c;
+}
 
 boolean isPipe(int fd)
 /* determine in an open file is a pipe  */
@@ -613,12 +610,12 @@ childExecFailedExit(cmd[0]); // cannot use the normal errAbort.
 
 }
 
-//void vaDumpStack(char *format, va_list args)
+void vaDumpStack(char *format, va_list args)
 /* debugging function to run the pstack program on the current process. In
  * prints a message, following by a new line, and then the stack track.  Just
  * prints errors to stderr rather than aborts. For debugging purposes
  * only.  */
-/*{
+{
 static boolean inDumpStack = FALSE;  // don't allow re-entry if called from error handler
 if (inDumpStack)
     return;
@@ -651,7 +648,7 @@ else
         fprintf(stderr, "pstack signaled %d\n", WTERMSIG(wstat));
     }
 inDumpStack = FALSE;
-}*/
+}
 
 void dumpStack(char *format, ...)
 /* debugging function to run the pstack program on the current process. In
@@ -661,8 +658,7 @@ void dumpStack(char *format, ...)
 {
 va_list args;
 va_start(args, format);
-//This function is removed due to the compatibility with Windows
-//vaDumpStack(format, args);
+vaDumpStack(format, args);
 va_end(args);
 }
 
@@ -692,7 +688,6 @@ else
     }
 return TRUE;
 }
-
 
 boolean isRegularFile(char *fileName)
 /* Return TRUE if fileName is a regular file. */
