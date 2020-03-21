@@ -857,10 +857,11 @@ for (el = list; el != NULL; el = el->next)
 return s;
 }
 
-struct slName *slNameLoadReal(char *fileName)
+//Remove in bigWig2
+//struct slName *slNameLoadReal(char *fileName)
 /* load file lines that are not blank or start with a '#' into a slName
  * list */
-{
+/*{
 struct slName *lines = NULL;
 char *line;
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
@@ -869,7 +870,7 @@ while (lineFileNextReal(lf, &line))
 lineFileClose(&lf);
 slReverse(&lines);
 return lines;
-}
+}*/
 
 struct slName *slNameIntersection(struct slName *a, struct slName *b)
 /* return intersection of two slName lists.  */

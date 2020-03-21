@@ -11,7 +11,7 @@
 #include "dystring.h"
 #include "errabort.h"
 #include "linefile.h"
-#include "pipeline.h"
+//#include "pipeline.h"
 #include "localmem.h"
 //#include "cheapcgi.h"
 #include "udc.h"

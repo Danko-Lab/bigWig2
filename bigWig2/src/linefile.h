@@ -172,7 +172,8 @@ boolean lineFileNextRow(struct lineFile *lf, char *words[], int wordCount);
 /* Return next non-blank line that doesn't start with '#' chopped into words.
  * Returns FALSE at EOF.  Aborts on error. */
 
-#define lineFileRow(lf, words) lineFileNextRow(lf, words, ArraySize(words))
+// Remove in bigWig2
+//#define lineFileRow(lf, words) lineFileNextRow(lf, words, ArraySize(words))
 /* Read in line chopped into fixed size word array. */
 
 boolean lineFileNextCharRow(struct lineFile *lf, char sep, char *words[], int wordCount);
