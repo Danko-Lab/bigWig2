@@ -9,7 +9,7 @@
 #include <sys/time.h>
 //#include <sys/statvfs.h>
 //#include <pwd.h>
-#include <termios.h>
+//#include <termios.h>
 #include "portable.h"
 //#include "portimpl.h"
 #include <sys/wait.h>
@@ -539,32 +539,32 @@ if (childId == -1)
 return childId;
 }
 
-int rawKeyIn()
+//int rawKeyIn()
 /* Read in an unbuffered, unechoed character from keyboard. */
-{
-struct termios attr;
-tcflag_t old;
-char c;
+//{
+//struct termios attr;
+//tcflag_t old;
+//char c;
 
 /* Set terminal to non-echoing non-buffered state. */
-if (tcgetattr(STDIN_FILENO, &attr) != 0)
-    errAbort("Couldn't do tcgetattr");
-old = attr.c_lflag;
-attr.c_lflag &= ~ICANON;
-attr.c_lflag &= ~ECHO;
-if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-    errAbort("Couldn't do tcsetattr");
+//if (tcgetattr(STDIN_FILENO, &attr) != 0)
+//    errAbort("Couldn't do tcgetattr");
+//old = attr.c_lflag;
+//attr.c_lflag &= ~ICANON;
+//attr.c_lflag &= ~ECHO;
+//if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
+//    errAbort("Couldn't do tcsetattr");
 
 /* Read one byte */
-if (read(STDIN_FILENO,&c,1) != 1)
-   errnoAbort("rawKeyIn: I/O error");
+//if (read(STDIN_FILENO,&c,1) != 1)
+//   errnoAbort("rawKeyIn: I/O error");
 
 /* Put back terminal to how it was. */
-attr.c_lflag = old;
-if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-    errAbort("Couldn't do tcsetattr2");
-return c;
-}
+//attr.c_lflag = old;
+//if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
+//    errAbort("Couldn't do tcsetattr2");
+//return c;
+//}
 
 boolean isPipe(int fd)
 /* determine in an open file is a pipe  */
