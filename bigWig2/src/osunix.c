@@ -594,9 +594,9 @@ when it tries to use its now invalid MySQL connections.
 
 }
 
-static void execPStack(pid_t ppid)
+//static void execPStack(pid_t ppid)
 /* exec pstack on the specified pid */
-{
+/*{
 char *cmd[3], pidStr[32];
 safef(pidStr, sizeof(pidStr), "%ld", (long)ppid);
 cmd[0] = "pstack";
@@ -611,7 +611,7 @@ execvp(cmd[0], cmd);
 
 childExecFailedExit(cmd[0]); // cannot use the normal errAbort.
 
-}
+}*/
 
 //void vaDumpStack(char *format, va_list args)
 /* debugging function to run the pstack program on the current process. In
