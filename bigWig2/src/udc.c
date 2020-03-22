@@ -1495,15 +1495,16 @@ if (retSize != NULL)
 return buf;
 }
 
-struct lineFile *udcWrapShortLineFile(char *url, char *cacheDir, size_t maxSize)
+//Remove in bigWig2
+//struct lineFile *udcWrapShortLineFile(char *url, char *cacheDir, size_t maxSize)
 /* Read in entire short (up to maxSize) url into memory and wrap a line file around it.
  * The cacheDir may be null in which case udcDefaultDir() will be used.  If maxSize
  * is zero then a default value (currently 64 meg) will be used. */
-{
+/*{
 if (maxSize == 0) maxSize = 64 * 1024 * 1024;
 char *buf = udcFileReadAll(url, cacheDir, maxSize, NULL);
 return lineFileOnString(url, TRUE, buf);
-}
+}*/
 
 void udcSeekCur(struct udcFile *file, bits64 offset)
 /* Seek to a particular position in file. */

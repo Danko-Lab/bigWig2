@@ -109,9 +109,10 @@ if (wordCount != 0)
 *retBuf = buf;
 }
 
-int countWordsInFile(char *fileName)
+//Remove in bigWig2
+//int countWordsInFile(char *fileName)
 /* Count number of words in file. */
-{
+/*{
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
 char *line;
 int wordCount = 0;
@@ -119,11 +120,11 @@ while (lineFileNext(lf, &line, NULL))
     wordCount += chopByWhite(line, NULL, 0);
 lineFileClose(&lf);
 return wordCount;
-}
+}*/
 
-struct hash *hashWordsInFile(char *fileName, int hashSize)
+//struct hash *hashWordsInFile(char *fileName, int hashSize)
 /* Create a hash of space delimited words in file. */
-{
+/*{
 struct hash *hash = newHash(hashSize);
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
 char *line, *word;
@@ -134,12 +135,13 @@ while (lineFileNext(lf, &line, NULL))
     }
 lineFileClose(&lf);
 return hash;
-}
+}*/
 
-struct hash *hashNameIntFile(char *fileName)
+//Remove in bigWig2
+//struct hash *hashNameIntFile(char *fileName)
 /* Given a two column file (name, integer value) return a
  * hash keyed by name with integer values */
-{
+/*{
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
 char *row[2];
 struct hash *hash = hashNew(16);
@@ -147,11 +149,11 @@ while (lineFileRow(lf, row))
     hashAddInt(hash, row[0], lineFileNeedNum(lf, row, 1));
 lineFileClose(&lf);
 return hash;
-}
+}*/
 
-struct hash *hashTwoColumnFile(char *fileName)
+//struct hash *hashTwoColumnFile(char *fileName)
 /* Given a two column file (key, value) return a hash. */
-{
+/*{
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
 char *row[2];
 struct hash *hash = hashNew(16);
@@ -163,11 +165,11 @@ while (lineFileRow(lf, row))
     }
 lineFileClose(&lf);
 return hash;
-}
+}*/
 
-struct slName *readAllLines(char *fileName)
+//struct slName *readAllLines(char *fileName)
 /* Read all lines of file into a list.  (Removes trailing carriage return.) */
-{
+/*{
 struct lineFile *lf = lineFileOpen(fileName, TRUE);
 struct slName *list = NULL, *el;
 char *line;
@@ -179,7 +181,7 @@ while (lineFileNext(lf, &line, NULL))
      }
 slReverse(&list);
 return list;
-}
+}*/
 
 void copyFile(char *source, char *dest)
 /* Copy file from source to dest. */
@@ -771,9 +773,10 @@ while ((c = *s) != 0)
     }
 }
 
-void printVmPeak()
+//Remove in bigWig2
+//void printVmPeak()
 /* print to stderr peak Vm memory usage (if /proc/ business exists) */
-{
+/*{
 pid_t pid = getpid();
 char temp[256];
 safef(temp, sizeof(temp), "/proc/%d/status", (int) pid);
@@ -794,7 +797,10 @@ if (lf)
 else
     fprintf(stderr, "# printVmPeak: %s - not available\n", temp);
 fflush(stderr);
-}
+}*/
+
+
+
 
 boolean nameInCommaList(char *name, char *commaList)
 /* Return TRUE if name is in comma separated list. */
